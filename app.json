@@ -1,0 +1,26 @@
+{
+  "id": "ffe9f6b8-9b70-4ad5-be51-a35a34213657",
+  "name": "SD Seminar",
+  "publisher": "D. E. Veloper",
+  "brief": "This is my Awesome Seminar Module",
+  "description": "This is my Awesome Description",
+  "version": "1.0.0.0",
+  "compatibilityId": "1.0.0.0",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "capabilities": [],
+  "dependencies": [],
+  "screenshots": [],
+  "platform": "11.0.0.0",
+  "application": "11.0.0.0",
+  "features": "TranslationFile",
+  "showMyCode": true,
+  "target": "Internal",
+  "idRange": {
+    "from": 123456700,
+    "to": 123456799
+  }
+}
