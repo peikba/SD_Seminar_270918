@@ -1,0 +1,65 @@
+codeunit 123456798 MyCodeunit
+{
+    trigger OnRun();
+    begin
+       ValidateLicenseNo(inLIcenseNo : Text[50];VAR outVersion : 'No License,Freeware,Object Backup,Customer Edition,Partner Edition,ISV Edition';VAR outExpiryDate : Date;VAR outInstalledDatabases : Integer)
+LicenseCheckXMLRequest(inLIcenseNo,BodyTempBlob);
+IF GetXMLResponse(BodyTempBlob) THEN
+  ValidateLicenseCheckXMLResponse(BodyTempBlob,outVersion,outExpiryDate,outInstalledDatabases);
+
+LicenseCheckXMLRequest(inLicenseNo : Text[50];VAR BodyTempBlob : Record TempBlob)
+XMLDoc := XMLDoc.XmlDocument;
+XMLProcessingInstr := XMLDoc.CreateProcessingInstruction('xml','version="1.0" encoding="UTF-8"');
+XMLNode:=XMLDoc.AppendChild(XMLProcessingInstr);
+XMLDocumentTxt:=
+    '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"> '+
+    '  <soap:Body> '+
+    '    <ValidateLicenseNo xmlns="urn:microsoft-dynamics-schemas/codeunit/WSFunc"> '+
+    '      <inLicenseNo>' + inLicenseNo + '</inLicenseNo> '+
+    '      <outExpiryDate>2016-01-01</outExpiryDate> '+
+    '      <outVMVersion /> '+
+    '      <outInstalledDatabases>0</outInstalledDatabases> '+
+    '    </ValidateLicenseNo> '+
+    '  </soap:Body> '+
+    '</soap:Envelope> ';
+XMLDoc.LoadXml(XMLDocumentTxt);
+CLEAR(BodyTempBlob.Blob);
+BodyTempBlob.Blob.CREATEOUTSTREAM(BodyContentOutputStream);
+XMLDoc.Save(BodyContentOutputStream);
+//TEST
+//BodyTempBlob.Blob.EXPORT('c:\temp\Request.XML');
+//TEST
+
+LOCAL ValidateLicenseCheckXMLResponse(VAR BodyTempBlob : Record TempBlob;VAR outVersion : 'No License,Freeware,Object Backup,Customer Edition,Partner Edition,ISV Edition';VAR outExpiryDate : Date;VAR outInstalledDatabases : Integer)
+//Validate the Response
+BodyTempBlob.Blob.CREATEINSTREAM(RespInputStream);
+XMLDoc := XMLDoc.XmlDocument;
+XMLDoc.Load(RespInputStream);
+
+XMLBody:=XMLDoc.InnerXml;
+ExpiryDateTxt:=FindTagValue(XMLBody,'<outExpiryDate>');
+IF ExpiryDateTxt<>'0001-01-01' THEN BEGIN
+  EVALUATE(ExpiryDateDay,COPYSTR(ExpiryDateTxt,9,2));
+  EVALUATE(ExpiryDateMonth,COPYSTR(ExpiryDateTxt,6,2));
+  EVALUATE(ExpiryDateYear,COPYSTR(ExpiryDateTxt,1,4));
+  outExpiryDate:=DMY2DATE(ExpiryDateDay,ExpiryDateMonth,ExpiryDateYear);
+END ELSE
+  outExpiryDate:=0D;
+VMVersionTxt:=FindTagValue(XMLBody,'<outVMVersion>');
+CASE VMVersionTxt OF
+  'Freeware'         : outVersion:=outVersion::Freeware;
+  'Object Backup'    : outVersion:=outVersion::"Object Backup";
+  'Customer Edition' : outVersion:=outVersion::"Customer Edition";
+  'Partner Edition'  : outVersion:=outVersion::"Partner Edition";
+  'ISV Edition'      : outVersion:=outVersion::"ISV Edition";
+  ELSE                 outVersion:=outVersion::Freeware;
+END;
+EVALUATE(outInstalledDatabases,FindTagValue(XMLBody,'<outInstalledDatabases>'));
+
+
+    end;
+    
+    var
+        Cust : Record Customer;
+        WarningTxt : label 'must be filled';
+}

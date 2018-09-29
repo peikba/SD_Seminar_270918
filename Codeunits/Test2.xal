@@ -1,0 +1,38 @@
+//GetXMLResponse(VAR BodyTempBlob : Record TempBlob) : Boolean
+URL := 'http://ba-consult.dk:7047/Privat_NavUser/WS/Bech-Andersen%20Consult%20ApS/Codeunit/WSFunc';
+Username:='Webservice';
+Password:='Webservice123';
+
+IF ISNULL(XMLDoc) THEN
+  XMLDoc := XMLDoc.XmlDocument;
+
+BodyTempBlob.Blob.CREATEINSTREAM(RespInputStream);
+XMLDoc := XMLDoc.XmlDocument;
+XMLDoc.Load(RespInputStream);
+
+Uri    := Uri.Uri(URL);
+WebReq := WebReq.CreateDefault(Uri);
+WebReq.Method := 'POST';
+WebReq.ContentType := 'text/xml';
+WebReq.Headers.Add('SOAPAction', 'urn:microsoft-dynamics-schemas/codeunit/WSFunc');
+IF (Username <> '') AND (Password <> '') THEN BEGIN
+  Credential := Credential.NetworkCredential(Username,Password);
+  WebReq.Credentials := Credential;
+END ELSE
+  WebReq.UseDefaultCredentials := TRUE;
+
+XMLDoc.Save(WebReq.GetRequestStream);
+
+WebReq.Timeout := 120000;
+WebResp := WebReq.GetResponse();
+
+RespInputStream:=WebResp.GetResponseStream();
+XMLDoc := XMLDoc.XmlDocument();
+XMLDoc.Load(RespInputStream);
+
+CLEAR(BodyTempBlob.Blob);
+
+BodyTempBlob.Blob.CREATEOUTSTREAM(RespOutpotStream);
+XMLDoc.Save(RespOutpotStream);
+
+EXIT(WebResp.StatusCode = 200);

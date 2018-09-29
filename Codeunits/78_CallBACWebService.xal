@@ -1,0 +1,44 @@
+codeunit 123456778 CallBACWebService
+{
+    trigger OnRun();
+    begin
+        URL := 'http://ba-consult.dk:7047/Privat_NavUser/WS/Bech-Andersen%20Consult%20ApS/Codeunit/WSFunc';
+        Username:='Webservice';
+        Password:='Webservice123';
+
+        BodyTempBlob.Blob.CREATEINSTREAM(RespInputStream);
+        XmlDocument.ReadFrom(RespInputStream,XMLdoc);
+        WebReq.SetRequestUri
+
+    end;
+    
+    procedure DownloadPicture(Url: Text;var TempBlob : Record TempBlob temporary) 
+    var 
+    Client: HttpClient; 
+    Response: HttpResponseMessage; 
+    InStr: InStream; 
+    OutStr: OutStream; 
+    begin 
+        Client.Get(Url,Response); 
+        Response.Content.ReadAs(InStr); 
+        TempBlob.Blob.CreateOutStream(OutStr); 
+        CopyStream(OutStr,InStr); 
+    end;
+    var
+        Url : Text;
+        UserName : Text[50];
+        Password : Text[50];
+        XMLdoc : XmlDocument;
+        BodyTempBlob : Record TempBlob;
+        RespInputStream : InStream;
+        WebReq : HttpRequestMessage;
+        Client: HttpClient; 
+        Response: HttpResponseMessage; 
+        InStr: InStream; 
+        OutStr: OutStream;
+
+
+
+
+
+}
