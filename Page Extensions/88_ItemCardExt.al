@@ -13,7 +13,7 @@ pageextension 123456788 "CSD Extend Item Card" extends "Item Card"
                     TempBlob: Record TempBlob temporary; 
                     InStr: InStream; 
                 begin 
-                    DownloadPicture( 'http://ba-consult.dk/downloads/bicycle.jpg',TempBlob); 
+                    DownloadPicture( 'https://images-na.ssl-images-amazon.com/images/I/81YABaKHneL._SL1500_.jpg',TempBlob); 
                     TempBlob.Blob.CreateInStream(InStr); 
                     rec.Picture.ImportStream(InStr,'Default image'); 
                     CurrPage.Update(true); 
