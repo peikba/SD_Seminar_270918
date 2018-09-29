@@ -79,7 +79,7 @@ codeunit 123456700 "CSD Seminar-Post"
                 PostSeminarJnlLine(0); // Instructor
                 // Post seminar room to seminar ledger 
                 PostSeminarJnlLine(1); // Room
-                SetAllowDelete(true);
+                //SetAllowDelete(true);
                 Delete(true);
             end;
 
